@@ -79,8 +79,6 @@ class MetadataParser(BaseParser):
 
         #: A dictionary of cached {namespace keyword: {(identifier, name): encoding}}
         self.namespace_to_term_to_encoding = namespace_to_term_to_encoding or {}
-        #: A set of namespaces's URLs that can't be cached
-        self.uncachable_namespaces = set()
         #: A dictionary of {namespace keyword: regular expression string}
         self.namespace_to_pattern = namespace_to_pattern or {}
         #: A set of names that can be used without a namespace

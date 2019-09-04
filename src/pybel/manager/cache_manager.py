@@ -872,14 +872,7 @@ class InsertManager(NamespaceManager, LookupManager):
         if VARIANTS in node or FUSION in node:
             node_model.is_variant = True
             node_model.has_fusion = FUSION in node
-
-            modifications = self.get_or_create_modification(graph, node)
-
-            if modifications is None:
-                log.warning('could not create %s because had an uncachable modification', node.as_bel())
-                return
-
-            node_model.modifications = modifications
+            node_model.modifications = self.get_or_create_modification(graph, node)
 
         self.session.add(node_model)
         self.object_cache_node[sha512] = node_model
@@ -1053,7 +1046,7 @@ class InsertManager(NamespaceManager, LookupManager):
         """Get a modification by a SHA512 hash."""
         return self.session.query(Modification).filter(Modification.sha512 == sha512).one_or_none()
 
-    def get_or_create_modification(self, graph: BELGraph, node: BaseEntity) -> Optional[List[Modification]]:
+    def get_or_create_modification(self, graph: BELGraph, node: BaseEntity) -> List[Modification]:
         """Create a list of node modification objects that belong to the node described by node_data.
 
         Return ``None`` if the list can not be constructed, and the node should also be skipped.
@@ -1072,18 +1065,10 @@ class InsertManager(NamespaceManager, LookupManager):
             p3_name = partner_3p_concept[NAME]
             p3_namespace_entry = self.get_namespace_entry(p3_namespace_url, p3_name)
 
-            if p3_namespace_entry is None:
-                log.warning('Could not find namespace entry %s %s', p3_namespace_url, p3_name)
-                return  # FIXME raise?
-
             partner_5p_concept = node[PARTNER_5P][CONCEPT]
             p5_namespace_url = graph.namespace_url[partner_5p_concept[NAMESPACE]]
             p5_name = partner_5p_concept[NAME]
             p5_namespace_entry = self.get_namespace_entry(p5_namespace_url, p5_name)
-
-            if p5_namespace_entry is None:
-                log.warning('Could not find namespace entry %s %s', p5_namespace_url, p5_name)
-                return  # FIXME raise?
 
             fusion_dict = {
                 'type': mod_type,
@@ -1151,21 +1136,25 @@ class InsertManager(NamespaceManager, LookupManager):
                             'position': variant[PMOD_POSITION] if PMOD_POSITION in variant else None
                         })
 
-        modifications = []
-        for modification in modification_list:
-            mod_hash = hash_dump(modification)
+        return [
+            self._help_get_mod(modification)
+            for modification in modification_list
+        ]
 
-            mod = self.object_cache_modification.get(mod_hash)
-            if mod is None:
-                mod = self.get_modification_by_hash(mod_hash)
-                if not mod:
-                    modification['sha512'] = mod_hash
-                    mod = Modification(**modification)
+    def _help_get_mod(self, modification) -> Modification:
+        mod_hash = hash_dump(modification)
+        mod = self.object_cache_modification.get(mod_hash)
+        if mod is not None:
+            return mod
+        mod = self.get_modification_by_hash(mod_hash)
+        if mod is None:
+            self.object_cache_modification[mod_hash] = mod
+            return mod
+        modification['sha512'] = mod_hash
+        mod = Modification(**modification)
+        self.object_cache_modification[mod_hash] = mod
+        return mod
 
-                self.object_cache_modification[mod_hash] = mod
-            modifications.append(mod)
-
-        return modifications
 
     def get_property_by_hash(self, property_hash: str) -> Optional[Property]:
         """Get a property by its hash if it exists."""
