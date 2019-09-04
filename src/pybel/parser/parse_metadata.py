@@ -56,6 +56,7 @@ class MetadataParser(BaseParser):
             default_namespace: Optional[Set[str]] = None,
             allow_redefinition: bool = False,
             skip_validation: bool = False,
+            strict_mapping: bool = False,
     ) -> None:
         """Build a metadata parser.
 
@@ -68,11 +69,13 @@ class MetadataParser(BaseParser):
         :param annotation_to_pattern: Regular expression annotation mapping from {annotation keyword: regex string}
         :param default_namespace: A set of strings that can be used without a namespace
         :param skip_validation: If true, don't download and cache namespaces/annotations
+        :param strict_mapping: If true, ensures there are identifier mappings for bel namespace files
         """
         #: This metadata parser's internal definition cache manager
         self.manager = manager
         self.disallow_redefinition = not allow_redefinition
         self.skip_validation = skip_validation
+        self.strict_mapping = strict_mapping
 
         #: A dictionary of cached {namespace keyword: {(identifier, name): encoding}}
         self.namespace_to_term_to_encoding = namespace_to_term_to_encoding or {}
@@ -181,7 +184,7 @@ class MetadataParser(BaseParser):
         if self.skip_validation:
             return tokens
 
-        namespace = self.manager.get_or_create_namespace(url)
+        namespace = self.manager.get_or_create_namespace(url=url, strict=self.strict_mapping)
         self.namespace_to_term_to_encoding[namespace_keyword] = namespace.get_term_to_encodings()
 
         return tokens

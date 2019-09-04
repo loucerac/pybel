@@ -181,11 +181,11 @@ class NamespaceManager(BaseManager):
 
         return namespace
 
-    def get_or_create_namespace(self, url: str) -> Namespace:
+    def get_or_create_namespace(self, url: str, strict: bool = False) -> Namespace:
         """Insert the namespace file at the given location to the cache.
 
-        If not cachable, returns the dict of the values of this namespace.
-
+        :param url: The URL of the namespace file
+        :param strict: If true, raises an error if no mapping file available with URL.
         :raises: pybel.resources.exc.ResourceError
         """
         result = self.get_namespace_by_url(url)
@@ -196,12 +196,7 @@ class NamespaceManager(BaseManager):
         t = time.time()
 
         bel_resource = get_bel_resource(url)
-
         _clean_bel_namespace_values(bel_resource)
-
-        values = bel_resource['Values']
-
-        namespace_insert_values = _get_namespace_insert_values(bel_resource)
 
         name_to_id = {}
         if url.endswith('-names.belns'):
@@ -210,16 +205,22 @@ class NamespaceManager(BaseManager):
                 res = requests.get(mapping_url)
                 res.raise_for_status()
             except requests.exceptions.HTTPError:
-                log.warning('No mappings found for %s', url)
+                _error_string = 'No mappings found for {}'.format(url)
+                if strict:
+                    raise ValueError(_error_string)
+                log.warning(_error_string)
             else:
                 mappings = res.json()
                 log.debug('got %d mappings', len(mappings))
                 name_to_id.update({v: k for k, v in res.json().items()})
 
+        namespace_insert_values = _get_namespace_insert_values(bel_resource)
         namespace = Namespace(
             url=url,
             **namespace_insert_values
         )
+
+        values = bel_resource['Values']
         namespace.entries = [
             NamespaceEntry(name=name, encoding=encoding, identifier=name_to_id.get(name))
             for name, encoding in values.items()
