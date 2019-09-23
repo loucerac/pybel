@@ -6,7 +6,7 @@ import logging
 import re
 from typing import Mapping, Optional, Pattern, Set
 
-from pyparsing import And, MatchFirst, ParseResults, Suppress, Word, pyparsing_common as ppc
+from pyparsing import And, MatchFirst, ParseResults, Suppress, Word, alphanums
 
 from .baseparser import BaseParser
 from .constants import NamespaceTermEncodingMapping
@@ -113,11 +113,14 @@ class MetadataParser(BaseParser):
             qid('value')
         ])
 
-        namespace_tag = And([define_tag, Suppress(BEL_KEYWORD_NAMESPACE), ppc.identifier('name'), as_tag])
+        # Identifier shared between namespaces and annotations
+        namespace_identifier = Word(alphanums + '_.')
+
+        namespace_tag = And([define_tag, Suppress(BEL_KEYWORD_NAMESPACE), namespace_identifier('name'), as_tag])
         self.namespace_url = And([namespace_tag, url_tag, quote('url')])
         self.namespace_pattern = And([namespace_tag, Suppress(BEL_KEYWORD_PATTERN), quote('value')])
 
-        annotation_tag = And([define_tag, Suppress(BEL_KEYWORD_ANNOTATION), ppc.identifier('name'), as_tag])
+        annotation_tag = And([define_tag, Suppress(BEL_KEYWORD_ANNOTATION), namespace_identifier('name'), as_tag])
         self.annotation_url = And([annotation_tag, url_tag, quote('url')])
         self.annotation_list = And([annotation_tag, list_tag, delimited_quoted_list('values')])
         self.annotation_pattern = And([annotation_tag, Suppress(BEL_KEYWORD_PATTERN), quote('value')])
@@ -138,7 +141,7 @@ class MetadataParser(BaseParser):
             self.namespace_pattern,
         ]).setName('BEL Metadata')
 
-        super(MetadataParser, self).__init__(self.language)
+        super().__init__(self.language)
 
     def handle_document(self, line: str, position: int, tokens: ParseResults) -> ParseResults:
         """Handle statements like ``SET DOCUMENT X = "Y"``.

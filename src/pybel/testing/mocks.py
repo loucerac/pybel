@@ -17,7 +17,6 @@ __all__ = [
 
 _responses = [
     ('go.belns', os.path.join(belns_dir_path, 'go-names.belns')),
-    ('hgnc-human-genes-20170725.belns', os.path.join(belns_dir_path, 'hgnc-names.belns')),
     ('chebi-20170725.belns', os.path.join(belns_dir_path, 'chebi-names.belns')),
     ('species-taxonomy-id-20170511.belanno', os.path.join(belanno_dir_path, 'species-taxonomy-id.belanno')),
     ('confidence-1.0.0.belanno', os.path.join(belanno_dir_path, 'confidence-1.0.0.belanno')),
@@ -29,10 +28,11 @@ class MockResponse:
 
     def __init__(self, url_to_mock: str):
         """Build a mock for the requests Response object."""
+        n = get_uri_name(url_to_mock)
         _r = [
-            ('.belns', os.path.join(belns_dir_path, get_uri_name(url_to_mock))),
-            ('.belanno', os.path.join(belanno_dir_path, get_uri_name(url_to_mock))),
-            ('.bel', os.path.join(bel_dir_path, get_uri_name(url_to_mock))),
+            ('.belns', os.path.join(belns_dir_path, n)),
+            ('.belanno', os.path.join(belanno_dir_path, n)),
+            ('.bel', os.path.join(bel_dir_path, n)),
         ]
 
         self.path = None

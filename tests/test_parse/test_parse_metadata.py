@@ -13,15 +13,14 @@ from pybel.parser import MetadataParser
 from pybel.parser.exc import (
     InvalidMetadataException, RedefinedAnnotationError, RedefinedNamespaceError, VersionFormatWarning,
 )
-from pybel.resources import HGNC_URL
 from pybel.testing.cases import FleetingTemporaryCacheMixin
 from pybel.testing.constants import test_an_1, test_ns_1
 from pybel.testing.mocks import mock_bel_resources
-from tests.constants import (
-    HGNC_KEYWORD, MESH_DISEASES_KEYWORD, MESH_DISEASES_URL, help_check_hgnc,
-)
+from tests.constants import HGNC_KEYWORD, MESH_DISEASES_KEYWORD, MESH_DISEASES_URL, help_check_hgnc
 
 logging.getLogger("requests").setLevel(logging.WARNING)
+
+HGNC_URL = 'https://example.com/hgnc-names.belns'
 
 
 class TestParseMetadata(FleetingTemporaryCacheMixin):
@@ -42,11 +41,15 @@ class TestParseMetadata(FleetingTemporaryCacheMixin):
     @mock_bel_resources
     def test_namespace_name_persistience(self, mock_get):
         """Tests that a namespace defined by a URL can't be overwritten by a definition by another URL"""
-        s = NAMESPACE_URL_FMT.format(HGNC_KEYWORD, HGNC_URL)
+        self._help_test_namespace_name_persistience(HGNC_KEYWORD, HGNC_URL)
+        self._help_test_namespace_name_persistience('hgnc.symbol', HGNC_URL)
+
+    def _help_test_namespace_name_persistience(self, keyword, url):
+        s = NAMESPACE_URL_FMT.format(keyword, url)
         self.parser.parseString(s)
         help_check_hgnc(self, self.parser.namespace_to_term_to_encoding)
 
-        s = NAMESPACE_URL_FMT.format(HGNC_KEYWORD, 'XXXXX')
+        s = NAMESPACE_URL_FMT.format(keyword, 'XXXXX')
         with self.assertRaises(RedefinedNamespaceError):
             self.parser.parseString(s)
 
@@ -55,7 +58,6 @@ class TestParseMetadata(FleetingTemporaryCacheMixin):
     @mock_bel_resources
     def test_annotation_name_persistience_1(self, mock_get):
         """Tests that an annotation defined by a URL can't be overwritten by a definition by a list"""
-
         s = ANNOTATION_URL_FMT.format(MESH_DISEASES_KEYWORD, MESH_DISEASES_URL)
         self.parser.parseString(s)
         self.assertIn(MESH_DISEASES_KEYWORD, self.parser.annotation_to_term)
@@ -135,7 +137,7 @@ class TestParseMetadata(FleetingTemporaryCacheMixin):
             'TestValue2': {'O'},
             'TestValue3': {'O'},
             'TestValue4': {'O'},
-            'TestValue5': {'O'}
+            'TestValue5': {'O'},
         }
 
         self.assertIn('TESTNS1', self.parser.namespace_to_term_to_encoding)
@@ -157,7 +159,7 @@ class TestParseMetadata(FleetingTemporaryCacheMixin):
             'TestAnnot2': 'O',
             'TestAnnot3': 'O',
             'TestAnnot4': 'O',
-            'TestAnnot5': 'O'
+            'TestAnnot5': 'O',
         }
 
         self.assertEqual(set(expected_values), self.parser.manager.get_annotation_entry_names(url))

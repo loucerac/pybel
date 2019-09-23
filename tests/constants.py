@@ -10,7 +10,7 @@ from pybel import BELGraph
 from pybel.constants import (
     ANNOTATIONS, ASSOCIATION, CITATION, CITATION_NAME, CITATION_REFERENCE, CITATION_TYPE, DECREASES, DIRECTLY_DECREASES,
     EVIDENCE, INCREASES, METADATA_AUTHORS, METADATA_DESCRIPTION, METADATA_LICENSES, METADATA_NAME, METADATA_VERSION,
-    OPENBEL_ANNOTATION_RESOURCES, RELATION,
+    RELATION,
 )
 from pybel.dsl import BaseEntity, ComplexAbundance, Pathology, Protein
 from pybel.dsl.namespaces import hgnc
@@ -31,7 +31,7 @@ from tests.constant_helper import (
     expected_test_thorough_metadata,
 )
 
-log = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 test_citation_dict = {
     CITATION_TYPE: 'PubMed',
@@ -44,7 +44,7 @@ test_set_evidence = 'SET Evidence = "{}"'.format(test_evidence_text)
 
 HGNC_KEYWORD = 'HGNC'
 MESH_DISEASES_KEYWORD = 'MeSHDisease'
-MESH_DISEASES_URL = OPENBEL_ANNOTATION_RESOURCES + "mesh-diseases.belanno"
+MESH_DISEASES_URL = "https://example.com/mesh-diseases.belanno"
 
 akt1 = hgnc(name='AKT1')
 egfr = hgnc(name='EGFR')

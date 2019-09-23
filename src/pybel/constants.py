@@ -7,12 +7,6 @@ This module maintains the strings used throughout the PyBEL codebase to promote 
 
 from .config import connection
 
-OPENBEL_DOMAIN = 'http://resources.openbel.org'
-
-FRAUNHOFER_RESOURCES = 'https://owncloud.scai.fraunhofer.de/index.php/s/JsfpQvkdx3Y5EMx/download?path='
-OPENBEL_NAMESPACE_RESOURCES = OPENBEL_DOMAIN + '/belframework/20150611/namespace/'
-OPENBEL_ANNOTATION_RESOURCES = OPENBEL_DOMAIN + '/belframework/20150611/annotation/'
-
 
 def get_cache_connection() -> str:
     """Get the preferred RFC-1738 database connection string.
