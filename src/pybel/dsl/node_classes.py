@@ -185,8 +185,8 @@ class Abundance(BaseAbundance):
     """Builds an abundance node.
 
     Example:
-
     >>> Abundance(namespace='CHEBI', name='water')
+
     """
 
     function = ABUNDANCE
@@ -196,8 +196,8 @@ class BiologicalProcess(BaseAbundance):
     """Builds a biological process node.
 
     Example:
-
     >>> BiologicalProcess(namespace='GO', name='apoptosis')
+
     """
 
     function = BIOPROCESS
@@ -207,8 +207,8 @@ class Pathology(BaseAbundance):
     """Build a pathology node.
 
     Example:
-
     >>> Pathology(namespace='DO', name='Alzheimer Disease')
+
     """
 
     function = PATHOLOGY
@@ -291,6 +291,7 @@ class CentralDogma(BaseAbundance):
         >>> ab42 = Protein(name='APP', namespace='HGNC', variants=[Fragment(start=672, stop=713)])
         >>> app = ab42.get_parent()
         >>> assert 'p(HGNC:APP)' == app.as_bel()
+
         """
         if VARIANTS not in self:
             return None
@@ -312,6 +313,7 @@ class CentralDogma(BaseAbundance):
         >>> app = Protein(name='APP', namespace='HGNC')
         >>> ab42 = app.with_variants([Fragment(start=672, stop=713)])
         >>> assert 'p(HGNC:APP, frag(672_713))' == ab42.as_bel()
+
         """
         return self.__class__(
             namespace=self.namespace,
@@ -357,7 +359,8 @@ class ProteinModification(Variant):
         Example from custom namespace additionally qualified with identifier:
 
         >>> ProteinModification(name='protein phosphorylation', namespace='GO',
-        >>>                     identifier='GO:0006468', code='Thr', position=308)
+        ...                     identifier='GO:0006468', code='Thr', position=308)
+
         """
         super().__init__(kind=PMOD)
 
@@ -418,7 +421,8 @@ class GeneModification(Variant):
 
         Example from custom namespace:
 
-        >>> GeneModification(name='DNA methylation', namespace='GO', identifier='GO:0006306',)
+        >>> GeneModification(name='DNA methylation', namespace='GO', identifier='GO:0006306')
+
         """
         super().__init__(kind=GMOD)
 
@@ -454,8 +458,8 @@ class Hgvs(Variant):
         :param variant: The HGVS variant string
 
         Example:
-
         >>> Protein(namespace='HGNC', name='AKT1', variants=[Hgvs('p.Ala127Tyr')])
+
         """
         super().__init__(kind=HGVS)
         self[HGVS] = variant
@@ -495,8 +499,8 @@ class ProteinSubstitution(Hgvs):
         :param to_aa: The 3-letter amino acid code of the new residue
 
         Example:
-
         >>> Protein(namespace='HGNC', name='AKT1', variants=[ProteinSubstitution('Ala', 127, 'Tyr')])
+
         """
         super().__init__('p.{}{}{}'.format(from_aa, position, to_aa))
 
@@ -523,6 +527,7 @@ class Fragment(Variant):
         Example of unspecified fragment:
 
         >>> Protein(name='APP', namespace='HGNC', variants=[Fragment()])
+
         """
         super().__init__(kind=FRAGMENT)
 
@@ -673,8 +678,8 @@ class Reaction(BaseEntity):
         :param products: A list of PyBEL node data dictionaries representing the products
 
         Example:
-
         >>> Reaction([Protein(namespace='HGNC', name='KNG1')], [Abundance(namespace='CHEBI', name='bradykinin')])
+
         """
         super().__init__()
 
@@ -795,8 +800,8 @@ class NamedComplexAbundance(BaseAbundance):
     """Build a named complex abundance node.
 
     Example:
+    >>> NamedComplexAbundance(namespace='FPLX', name='Calcineurin Complex')
 
-        >>> NamedComplexAbundance(namespace='FPLX', name='Calcineurin Complex')
     """
 
     function = COMPLEX

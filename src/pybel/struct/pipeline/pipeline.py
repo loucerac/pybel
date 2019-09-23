@@ -149,10 +149,10 @@ class Pipeline:
         :return: This pipeline for fluid query building
 
         Example:
-
         >>> p1 = Pipeline.from_functions(['enrich_protein_and_rna_origins'])
         >>> p2 = Pipeline.from_functions(['remove_pathologies'])
         >>> p1.extend(p2)
+
         """
         for data in protocol:
             name, args, kwargs = _get_protocol_tuple(data)
