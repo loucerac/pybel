@@ -4,19 +4,19 @@ import os
 from pathlib import Path
 
 from pybel import BELGraph, Manager
-from pybel.constants import ANNOTATIONS, OPENBEL_ANNOTATION_RESOURCES
+from pybel.constants import ANNOTATIONS
 from pybel.resources import HGNC_URL
 from pybel.testing.cases import TemporaryCacheClsMixin
 from pybel.testing.constants import belns_dir_path
 from pybel.testing.mocks import mock_bel_resources
 
 ns1 = Path(os.path.join(belns_dir_path, 'disease-ontology.belns')).as_uri()
-ns1_url = 'http://resources.openbel.org/belframework/20150611/namespace/disease-ontology-ids.belns'
+ns1_url = 'http://example.com/disease-ontology-ids.belns'
 
 ns2 = Path(os.path.join(belns_dir_path, 'mesh-diseases.belns')).as_uri()
-ns2_url = 'http://resources.openbel.org/belframework/20150611/namespace/mesh-diseases.belns'
+ns2_url = 'http://example.com/mesh-diseases.belns'
 
-CELL_LINE_URL = OPENBEL_ANNOTATION_RESOURCES + 'cell-line.belanno'
+CELL_LINE_URL = 'http://example.com/cell-line.belanno'
 CELL_LINE_KEYWORD = 'CellLine'
 
 
